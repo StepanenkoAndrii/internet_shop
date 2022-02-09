@@ -1,0 +1,33 @@
+{
+  "name": "internet_shop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.ts",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/app.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.1",
+    "config": "^3.3.7",
+    "dayjs": "^1.10.7",
+    "express": "^4.17.2",
+    "lodash": "^4.17.21",
+    "pg": "^8.7.3",
+    "pino": "^7.6.5",
+    "pino-pretty": "^7.5.1",
+    "undici": "^4.13.0"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.19.2",
+    "@types/config": "0.0.41",
+    "@types/express": "^4.17.13",
+    "@types/lodash": "^4.14.178",
+    "@types/node": "^17.0.16",
+    "@types/pg": "^8.6.4",
+    "@types/pino": "^7.0.5",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.5.5"
+  }
+}
