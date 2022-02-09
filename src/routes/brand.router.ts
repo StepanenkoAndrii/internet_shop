@@ -1,13 +1,12 @@
 import express from "express";
-import cityController from "../controllers/city.controller";
+import brandController from "../controllers/brand.controller";
 
 const router = express.Router();
 
-router.get("/api", cityController.getAllApiCities);
-router.post("/fill", cityController.addLinks);
+router.get("/api", brandController.getAllApiBrands);
 // router.get("/:id", citiesController.getCityById);
 // router.get("/", citiesController.getAllCities);
-router.post("/api", cityController.importApiCities);
+router.post("/api", brandController.importApiBrands);
 // router.delete("/:id", citiesController.deleteCity);
 // router.post("/", citiesController.createCity);
 

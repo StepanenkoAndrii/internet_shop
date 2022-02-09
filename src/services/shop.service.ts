@@ -19,11 +19,6 @@ interface Shop {
     discounts?: number,
 }
 
-// interface importedShop extends Shop {
-//     categories_id: number,
-//     discounts: number,
-// }
-
 interface importedShops {
     shops: Shop[],
 }
@@ -44,59 +39,52 @@ export default {
                        (id, name, slug, website, image, image_100, image_50, image_25, image_map, url) 
                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`;
 
-        let resultShops: Shop[] = [];
         const apiShops = await this.getAllApiShops();
 
         for (const apiShop of apiShops!) {
-            resultShops.push(apiShop);
-        }
-        for (const resultShop of resultShops) {
-            // delete resultShop.categories_id;
-            // delete resultShop.discounts;
-            // const values = Object.values(resultShop);
-            const values = Object.values(_.omit( resultShop, ['categories_id', 'discounts']));
+            const values = Object.values(_.omit(apiShop, ['categories_id', 'discounts']));
             await pool?.query(query, values);
         }
 
-        return resultShops;
+        return apiShops;
     },
 
-    async getAllShops(): Promise<object[] | undefined> {
-        const query = `SELECT * FROM shops`;
-        const shops = await pool?.query(query);
-
-        if (shops) return shops.rows;
-        return undefined;
-    },
-
-    async getShopById(shopId: number) {
-        const query = `SELECT * FROM shops WHERE id = $1`;
-        const values = [shopId];
-        const shop = await pool?.query(query, values);
-
-        if (shop) return shop.rows[0];
-        return undefined;
-    },
-
-    async deleteShop(shopId: number) {
-        const query = `DELETE FROM shops WHERE id = $1 RETURNING id`;
-        const values = [shopId];
-        const deletedShopsNumber = await pool?.query(query, values);
-
-        return !!deletedShopsNumber?.rowCount;
-    },
-
-    async createShop(newShopParams: Shop) {
-        const query = `INSERT INTO shops 
-                       (name, name_in_english) 
-                       VALUES ($1, $2, $3, $4, $5) RETURNING *`;
-        const values = [
-            newShopParams.name,
-            // newShopParams.nameInEnglish,
-        ];
-        const newShop = await pool?.query(query, values);
-
-        if (newShop) return newShop.rows[0];
-        return undefined;
-    },
+    // async getAllShops(): Promise<object[] | undefined> {
+    //     const query = `SELECT * FROM shops`;
+    //     const shops = await pool?.query(query);
+    //
+    //     if (shops) return shops.rows;
+    //     return undefined;
+    // },
+    //
+    // async getShopById(shopId: number) {
+    //     const query = `SELECT * FROM shops WHERE id = $1`;
+    //     const values = [shopId];
+    //     const shop = await pool?.query(query, values);
+    //
+    //     if (shop) return shop.rows[0];
+    //     return undefined;
+    // },
+    //
+    // async deleteShop(shopId: number) {
+    //     const query = `DELETE FROM shops WHERE id = $1 RETURNING id`;
+    //     const values = [shopId];
+    //     const deletedShopsNumber = await pool?.query(query, values);
+    //
+    //     return !!deletedShopsNumber?.rowCount;
+    // },
+    //
+    // async createShop(newShopParams: Shop) {
+    //     const query = `INSERT INTO shops
+    //                    (name, name_in_english)
+    //                    VALUES ($1, $2, $3, $4, $5) RETURNING *`;
+    //     const values = [
+    //         newShopParams.name,
+    //         // newShopParams.nameInEnglish,
+    //     ];
+    //     const newShop = await pool?.query(query, values);
+    //
+    //     if (newShop) return newShop.rows[0];
+    //     return undefined;
+    // },
 };

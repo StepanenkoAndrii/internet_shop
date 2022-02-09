@@ -15,30 +15,30 @@ export default {
         res.send(importedApiCategories);
     },
 
-    async getAllCategories(req: Request, res: Response) {
-        const categories = await categoryService.getAllCategories();
-        logger.info(categories);
-        res.send(categories);
-    },
-
-    async getCategoryById(req: Request, res: Response) {
-        const category = await categoryService.getCategoryById(Number(req.params.id));
-        logger.info(category);
-        res.send(category);
-    },
-
-    async deleteCategory(req: Request, res: Response) {
-        const categoryIsDeleted = await categoryService.deleteCategory(Number(req.params.id));
-        if (categoryIsDeleted) {
-            logger.info(categoryIsDeleted);
-            res.send(`category with id = ${req.params.id} is successfully deleted`);
-        }
-        res.send(`category with id = ${req.params.id} doesn't exist`);
-    },
-
-    async createCategory(req: Request, res: Response) {
-        const newCategory = await categoryService.createCategory(req.body);
-        logger.info(newCategory);
-        res.send(newCategory);
-    },
+    // async getAllCategories(req: Request, res: Response) {
+    //     const categories = await categoryService.getAllCategories();
+    //     logger.info(categories);
+    //     res.send(categories);
+    // },
+    //
+    // async getCategoryById(req: Request, res: Response) {
+    //     const category = await categoryService.getCategoryById(Number(req.params.id));
+    //     logger.info(category);
+    //     res.send(category);
+    // },
+    //
+    // async deleteCategory(req: Request, res: Response) {
+    //     const categoryIsDeleted = await categoryService.deleteCategory(Number(req.params.id));
+    //     if (categoryIsDeleted) {
+    //         logger.info(categoryIsDeleted);
+    //         res.send(`category with id = ${req.params.id} is successfully deleted`);
+    //     }
+    //     res.send(`category with id = ${req.params.id} doesn't exist`);
+    // },
+    //
+    // async createCategory(req: Request, res: Response) {
+    //     const newCategory = await categoryService.createCategory(req.body);
+    //     logger.info(newCategory);
+    //     res.send(newCategory);
+    // },
 };
