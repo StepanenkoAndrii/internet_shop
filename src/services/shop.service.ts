@@ -1,32 +1,17 @@
 import {Request, Response} from "express";
 import {fetch, Response as Res} from "undici";
+import format from "pg-format";
 import _ from "lodash";
 import logger from "../utils/logger";
 import pool from "../app";
-
-interface Shop {
-    id: number,
-    name: string,
-    slug: string,
-    website: string,
-    image: string,
-    image_100: string,
-    image_50: string,
-    image_25: string,
-    image_map: string,
-    url: string,
-    categories_id?: number,
-    discounts?: number,
-}
-
-interface importedShops {
-    shops: Shop[],
-}
+import {Shop, importedShops} from "../interfaces";
 
 async function fetchJsonShops(): Promise<importedShops | undefined> {
     const res: Res = await fetch('https://gotoshop.ua/apiv3/shops?limit=1500');
     return await res.json() as importedShops;
 }
+
+// bulk insert
 
 export default {
     async getAllApiShops(): Promise<Shop[] | undefined> {
@@ -35,18 +20,21 @@ export default {
     },
 
     async importApiShops(): Promise<Shop[] | undefined> {
-        const query = `INSERT INTO shops 
-                       (id, name, slug, website, image, image_100, image_50, image_25, image_map, url) 
-                       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`;
-
         const apiShops = await this.getAllApiShops();
+        const shopValues = apiShops?.map(shop => {
+            const {categories_id, discounts, ...other} = shop;
+            return Object.values(other);
+        })
+        const query = format(`INSERT INTO shops 
+                       (id, name, slug, website, image, image_100, image_50, image_25, image_map, url) 
+                       VALUES %L RETURNING *`, shopValues);
 
-        for (const apiShop of apiShops!) {
-            const values = Object.values(_.omit(apiShop, ['categories_id', 'discounts']));
-            await pool?.query(query, values);
+        const shops = await pool?.query(query);
+
+        if (shops && shops.rowCount > 0) {
+            return shops.rows;
         }
-
-        return apiShops;
+        return undefined;
     },
 
     // async getAllShops(): Promise<object[] | undefined> {

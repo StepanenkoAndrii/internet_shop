@@ -3,19 +3,7 @@ import {fetch, Response as Res} from "undici";
 import _ from "lodash";
 import logger from "../utils/logger";
 import pool from "../app";
-
-interface Brand {
-    id: number,
-    name_ru: string,
-    name_orig: string,
-    name: string,
-    image: string,
-    url: string,
-}
-
-interface importedBrands {
-    brands: Brand[],
-}
+import {Brand, importedBrands} from "../interfaces";
 
 async function fetchJsonBrands(): Promise<importedBrands | undefined> {
     const res: Res = await fetch('https://gotoshop.ua/apiv3/brands/?limit=18000');

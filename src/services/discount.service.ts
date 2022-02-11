@@ -3,22 +3,7 @@ import {fetch, Response as Res} from "undici";
 import _ from "lodash";
 import logger from "../utils/logger";
 import pool from "../app";
-
-interface Discount {
-    id: number,
-    name: string,
-    slug: string,
-    start_date: string,
-    end_date: string,
-    days_title: string,
-    color: number,
-    date: string,
-    discount_url: string,
-}
-
-interface importedDiscounts {
-    discounts: Discount[],
-}
+import {Discount, importedDiscounts} from "../interfaces";
 
 async function fetchJsonDiscounts(): Promise<importedDiscounts | undefined> {
     const res: Res = await fetch('https://gotoshop.ua/apiv3/discounts/?limit=1100');

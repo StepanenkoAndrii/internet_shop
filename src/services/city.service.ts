@@ -3,82 +3,16 @@ import {fetch, Response as Res} from "undici";
 import logger from "../utils/logger";
 import pool from "../app";
 import _ from "lodash";
-
-interface City {
-    id: number,
-    name: string,
-    name2: string,
-    name3: string,
-    slug: string,
-    state: string,
-    region: string,
-    lat: number,
-    lng: number,
-    diff: string,
-    capital: number
-}
-
-interface importedCities {
-    cities: City[],
-}
-
-interface Product {
-    id: number,
-    slug: string,
-    discount_id: number,
-    external_url: string,
-    price_before: number,
-    price_after?: number,
-    discount?: number,
-    discount_type?: string,
-    image_contains_price: number,
-    start_date?: string,
-    end_date?: string,
-    catalogs_id?: number,
-    quantity?: number,
-    quantity_unit: string,
-    name2: string,
-    name: string,
-    image_336?: object,
-    image_full?: object,
-    count_plus: number,
-    count_minus: number,
-    shops_ids?: [],
-    shops?: [],
-    comments: number,
-    days_title?: string,
-    date?: string,
-    discount_name?: string,
-    color?: number,
-    units: string,
-    noted: number,
-    not_all_addr: number,
-    addresses_image?: object,
-    url: string,
-    phone: string,
-    liked: number,
-    desc: string,
-    discount_url?: string,
-    num: number,
-    logged_in_user_id?: number,
-    ask_list_before_add: number,
-    total_count: boolean,
-    brands?: [],
-    pcategories?: [],
-    quantity_unit_val?: string,
-}
-
-interface importedProducts {
-    products: Product[],
-}
+import {City, importedCities, Product, importedProducts} from "../interfaces";
 
 async function fetchJsonCities(): Promise<importedCities | undefined> {
     const res: Res = await fetch('https://gotoshop.ua/apiv3/cities/?limit=100');
     return await res.json() as importedCities;
 }
 
-async function fetchJsonCityProducts(cityId: number): Promise<importedProducts | undefined> {
-    const res: Res = await fetch(`https://gotoshop.ua/apiv3/products/?limit=2500&city_id=${cityId}`);
+async function fetchJsonCityProducts(cityId: number, offset: number): Promise<importedProducts | undefined> {
+    // const res: Res = await fetch(`https://gotoshop.ua/apiv3/products/?limit=1000&offset=3000&city_id=${cityId}`);
+    const res: Res = await fetch(`https://gotoshop.ua/apiv3/products/?limit=1000&offset=${offset}&city_id=${cityId}`);
     return await res.json() as importedProducts;
 }
 
@@ -100,35 +34,53 @@ export default {
             await pool?.query(query, values);
         }
 
+
+
         return apiCities;
     },
 
     // to fill city-shop-links table
 
     async addLinks() {
+        // const sleep = (t: number | undefined) => new Promise((resolve) => setTimeout(resolve, t));
+        // sleep(1000).then()
+
         const query = `INSERT INTO city_shop_links (city_id, shop_id)
                        VALUES ($1, $2) RETURNING *`;
         const allCities = await this.getAllCities() as City[];
 
-        for (const city of allCities) {
-            const apiCityProductsObj = await fetchJsonCityProducts(Number(city.id));
-            const allCityProducts = apiCityProductsObj?.products as Product[] ?? undefined;
+        // const citiesArr = allCities.map(city => {
+        //
+        // });
+        //
+        // Promise.allSettled(citiesArr).then();
 
-            for (const cityProduct of allCityProducts) {
-                if (cityProduct.shops_ids && cityProduct.shops_ids.length > 0) {
-                    for (const shop_id of cityProduct.shops_ids) {
-                        const linkAlreadyExists = await this.checkCityShopLinkByBothIds(Number(city.id), Number(shop_id));
-                        if (!linkAlreadyExists) {
-                            const values = [
-                                Number(city.id),
-                                Number(shop_id),
-                            ];
-                            const newCityShopLink = await pool?.query(query, values);
-                            console.log(newCityShopLink!.rows[0]);
+        for (const city of allCities) {
+            for (let i = 4; i < 20; i++) {
+                const apiCityProductsObj = await fetchJsonCityProducts(Number(city.id), i * 1000);
+                const allCityProducts = apiCityProductsObj?.products as Product[] ?? undefined;
+
+                console.log(allCityProducts[0]);
+
+
+
+                for (const cityProduct of allCityProducts) {
+                    if (cityProduct.shops_ids && cityProduct.shops_ids.length > 0) {
+                        for (const shop_id of cityProduct.shops_ids) {
+                            const linkAlreadyExists = await this.checkCityShopLinkByBothIds(Number(city.id), Number(shop_id));
+                            if (!linkAlreadyExists) {
+                                const values = [
+                                    Number(city.id),
+                                    Number(shop_id),
+                                ];
+                                const newCityShopLink = await pool?.query(query, values);
+                                console.log(newCityShopLink!.rows[0]);
+                            }
                         }
                     }
                 }
             }
+
         }
     },
 
@@ -137,7 +89,7 @@ export default {
         const values = [cityId, shopId];
         const links = await pool?.query(query, values);
 
-        return !!links;
+        return !!links?.rowCount ?? null;
     },
 
     // end of city-shop-links adding

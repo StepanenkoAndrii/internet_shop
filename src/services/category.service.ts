@@ -1,19 +1,10 @@
 import {Request, Response} from "express";
 import {fetch, Response as Res} from "undici";
+import format from "pg-format";
 import logger from "../utils/logger";
 import pool from "../app";
 import _ from "lodash";
-
-type Category = {
-    id: number,
-    name: string,
-    slug: string,
-    discounts: number,
-};
-
-type importedCategories = {
-    categories: Category[],
-};
+import {Category, importedCategories} from "../interfaces";
 
 async function fetchJsonCategories(): Promise<importedCategories | undefined> {
     const res: Res = await fetch('https://gotoshop.ua/apiv3/categories?limit=15');
@@ -27,18 +18,35 @@ export default {
     },
 
     async importApiCategories(): Promise<Category[] | undefined> {
-        const query = `INSERT INTO categories (id, name, slug) 
-                       VALUES ($1, $2, $3) RETURNING *`;
-
         const apiCategories = await this.getAllApiCategories();
+        const categoryValues = apiCategories?.map(category => {
+            const {discounts, ...other} = category;
+            return Object.values(other);
+        });
+        const query = format(`INSERT INTO categories (id, name, slug) 
+                                   VALUES %L RETURNING *`, categoryValues);
 
-        for (const apiCategory of apiCategories!) {
-            const values = Object.values(_.omit(apiCategory, ['discounts']));
-            await pool?.query(query, values);
+        const categories = await pool?.query(query);
+
+        if (categories && categories.rowCount > 0) {
+            return categories.rows;
         }
-
-        return apiCategories;
+        return undefined;
     },
+
+    // async importApiCategories(): Promise<Category[] | undefined> {
+    //     const query = `INSERT INTO categories (id, name, slug)
+    //                    VALUES ($1, $2, $3) RETURNING *`;
+    //
+    //     const apiCategories = await this.getAllApiCategories();
+    //
+    //     for (const apiCategory of apiCategories!) {
+    //         const values = Object.values(_.omit(apiCategory, ['discounts']));
+    //         await pool?.query(query, values);
+    //     }
+    //
+    //     return apiCategories;
+    // },
 
     // async getAllCategories(): Promise<object[] | undefined> {
     //     const query = `SELECT * FROM categories`;
