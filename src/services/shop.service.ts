@@ -37,14 +37,14 @@ export default {
         return undefined;
     },
 
-    // async getAllShops(): Promise<object[] | undefined> {
-    //     const query = `SELECT * FROM shops`;
-    //     const shops = await pool?.query(query);
-    //
-    //     if (shops) return shops.rows;
-    //     return undefined;
-    // },
-    //
+    async getAllShops(): Promise<Shop[] | undefined> {
+        const query = `SELECT * FROM shops`;
+        const shops = await pool?.query(query);
+
+        if (shops) return shops.rows;
+        return undefined;
+    },
+
     // async getShopById(shopId: number) {
     //     const query = `SELECT * FROM shops WHERE id = $1`;
     //     const values = [shopId];

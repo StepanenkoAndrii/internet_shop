@@ -15,12 +15,12 @@ export default {
         res.send(importedApiShops);
     },
 
-    // async getAllShops(req: Request, res: Response) {
-    //     const shops = await shopService.getAllShops();
-    //     logger.info(shops);
-    //     res.send(shops);
-    // },
-    //
+    async getAllShops(req: Request, res: Response) {
+        const shops = await shopService.getAllShops();
+        logger.info(shops);
+        res.send(shops);
+    },
+
     // async getShopById(req: Request, res: Response) {
     //     const shop = await shopService.getShopById(Number(req.params.id));
     //     logger.info(shop);

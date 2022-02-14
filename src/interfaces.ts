@@ -135,4 +135,11 @@ export interface Product {
 }
 export interface importedProducts {
     products: Product[],
+    totalCount: number,
+    input: {
+        get: {
+            city_id: number,
+            shop_id: number,
+        }
+    }
 }
