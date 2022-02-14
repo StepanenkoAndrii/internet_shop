@@ -1,6 +1,7 @@
 import {Request, Response} from "express";
 import {fetch, Response as Res} from "undici";
 import _ from "lodash";
+
 import logger from "../utils/logger";
 import pool from "../app";
 import {Brand, importedBrands} from "../interfaces";

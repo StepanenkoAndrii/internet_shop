@@ -1,0 +1,22 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+// import productRouter from "./product.router";
+const city_router_1 = __importDefault(require("./city.router"));
+const category_router_1 = __importDefault(require("./category.router"));
+const shop_router_1 = __importDefault(require("./shop.router"));
+const discount_router_1 = __importDefault(require("./discount.router"));
+const productImage_router_1 = __importDefault(require("./productImage.router"));
+const brand_router_1 = __importDefault(require("./brand.router"));
+const router = express_1.default.Router();
+// router.use("/products", productRouter);
+router.use("/cities", city_router_1.default);
+router.use("/discounts", discount_router_1.default);
+router.use("/categories", category_router_1.default);
+router.use("/shops", shop_router_1.default);
+router.use("/images", productImage_router_1.default);
+router.use("/brands", brand_router_1.default);
+exports.default = router;
